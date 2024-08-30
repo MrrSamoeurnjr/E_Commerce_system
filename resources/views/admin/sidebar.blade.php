@@ -1,3 +1,86 @@
+<style>
+  .nav-item.menu-items {
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.nav-item.menu-items:hover {
+    background-color: #2a3f54;
+}
+
+.nav-item .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    transition: color 0.3s ease;
+}
+
+.nav-item .nav-link:hover {
+    color: #1abc9c;
+}
+
+.nav-item .menu-icon i {
+    font-size: 18px;
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+}
+
+.nav-item .menu-icon i:hover {
+    transform: rotate(20deg);
+}
+
+.nav-item .nav-link i.menu-arrow {
+    transition: transform 0.3s ease;
+}
+
+.nav-item .nav-link[aria-expanded="true"] i.menu-arrow {
+    transform: rotate(90deg);
+}
+
+.nav-item .sub-menu {
+    padding-left: 30px;
+}
+
+.nav-item .sub-menu .nav-link {
+    padding: 8px 15px;
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-item .sub-menu .nav-link:hover {
+    background-color: #34495e;
+    color: #ecf0f1;
+}
+/* Add smooth transition for the collapse */
+.collapse {
+        transition: height 0.3s ease;
+    }
+
+    /* Customize the menu icon arrow rotation */
+    .menu-arrow {
+        transition: transform 0.3s ease;
+    }
+
+    .collapsed .menu-arrow {
+        transform: rotate(-90deg);
+    }
+
+    /* Customize the hover effect on sub-menu items */
+    .sub-menu .nav-link:hover {
+        color: #ff5722; /* Customize the color on hover */
+        text-decoration: underline;
+    }
+
+</style>
+<script>
+    $(document).ready(function(){
+        // Handle the collapse toggle and arrow rotation
+        $('[data-toggle="collapse"]').on('click', function() {
+            $(this).find('.menu-arrow').toggleClass('collapsed');
+        });
+    });
+</script>
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <div class="sidebar-brand-wrapper d-none d-lg-flex align-items-center justify-content-center fixed-top">
           <a class="sidebar-brand brand-logo" href="index.html"><img src="admin/assets/images/logo.svg" alt="logo" /></a>
@@ -83,6 +166,7 @@
               </ul>
             </div>
           </li>
+
           <li class="nav-item menu-items">
             <a class="nav-link" href="{{url('view_category')}}">
               <span class="menu-icon">
@@ -107,5 +191,166 @@
               <span class="menu-title">Popular product</span>
             </a>
           </li>
+          <li class="nav-item menu-items">
+    <a class="nav-link" href="{{ url('user_activity_log') }}">
+        <span class="menu-icon">
+            <i class="mdi mdi-playlist-play"></i>
+        </span>
+        <span class="menu-title">User Activity Log</span>
+    </a>
+</li>
+
+
+<!-- <li class="nav-item menu-items">
+            <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+              <span class="menu-icon">
+                <i class="mdi mdi-laptop"></i>
+              </span>
+              <span class="menu-title">Sales Reports</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="ui-basic">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> 
+                  <a class="nav-link" href="{{ url('/daily_monthly_sale') }}">Daily/Weekly/Monthly Sales</a>
+                </li>
+                <li class="nav-item">
+                   <a class="nav-link"  href="{{url('/top_selling')}}">Top Selling Products</a>
+                </li>
+                <li class="nav-item"> 
+                  <a class="nav-link" href="{{ url('/sale_by_cateogry') }}">Sales by Category</a>
+                </li>
+                <li class="nav-item">
+                   <a class="nav-link"  href="{{url('/sale_by_reqion')}}">Sales by Region</a>
+                </li>
+                <li class="nav-item">
+                   <a class="nav-link"  href="{{url('/sale_growth')}}">Sales Growth</a>
+                </li>
+              </ul>
+            </div>
+ </li> -->
+ <li class="nav-item menu-items">
+    <a class="nav-link" data-toggle="collapse" href="#sales-reports" aria-expanded="false" aria-controls="sales-reports">
+        <span class="menu-icon">
+            <i class="mdi mdi-chart-line"></i>
+        </span>
+        <span class="menu-title">Sales Reports</span>
+        <i class="menu-arrow"></i>
+    </a>
+    <div class="collapse" id="sales-reports">
+        <ul class="nav flex-column sub-menu">
+            <li class="nav-item"> 
+                <a class="nav-link" href="{{ url('/daily_monthly_sale') }}">
+                    <i class="mdi mdi-calendar"></i> Daily/Weekly/Monthly Sales
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/top_selling') }}">
+                    <i class="mdi mdi-star"></i> Top Selling Products
+                </a>
+            </li>
+            <li class="nav-item"> 
+                <a class="nav-link" href="{{ url('/sale_by_cateogry') }}">
+                    <i class="mdi mdi-tag-multiple"></i> Sales by Category
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/sale_by_reqion') }}">
+                    <i class="mdi mdi-map-marker"></i> Sales by Region
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/sale_growth') }}">
+                    <i class="mdi mdi-trending-up"></i> Sales Growth
+                </a>
+            </li>
         </ul>
-      </nav>
+    </div>
+</li>
+
+ <!-- <li class="nav-item menu-items">
+            <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+              <span class="menu-icon">
+                <i class="mdi mdi-laptop"></i>
+              </span>
+              <span class="menu-title">Customer Behavior Reports</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="ui-basic">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> 
+                  <a class="nav-link" href="{{ url('/new_vs_Returning_Customers') }}">New vs. Returning Customers</a>
+                </li>
+                <li class="nav-item">
+                   <a class="nav-link"  href="{{url('/top_selling')}}">Customer Demographics</a>
+                </li>
+                <li class="nav-item"> 
+                  <a class="nav-link" href="{{ url('/sale_by_cateogry') }}">Customer Purchase Frequency</a>
+                </li>
+                <li class="nav-item">
+                   <a class="nav-link"  href="{{url('/sale_by_reqion')}}">Customer Lifetime Value (CLV)</a>
+                </li>
+                <li class="nav-item">
+                   <a class="nav-link"  href="{{url('/sale_growth')}}">Customer Feedback and Reviews</a>
+                </li>
+              </ul>
+            </div>
+ </li> -->
+ <li class="nav-item menu-items">
+    <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+        <span class="menu-icon">
+            <i class="mdi mdi-laptop"></i>
+        </span>
+        <span class="menu-title">Customer Behavior Reports</span>
+        <i class="menu-arrow"></i>
+    </a>
+    <div class="collapse" id="ui-basic">
+        <ul class="nav flex-column sub-menu">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/new_vs_Returning_Customers') }}">New vs. Returning Customers</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/customer_demo') }}">Customer Demographics</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/customer_purchase_f') }}">Customer Purchase Frequency</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/customer_lifetime_value') }}">Customer Lifetime Value (CLV)</a>
+            </li>
+        </ul>
+    </div>
+</li>
+
+<!-- 
+<li class="nav-item menu-items">
+    <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+        <span class="menu-icon">
+            <i class="mdi mdi-laptop"></i>
+        </span>
+        <span class="menu-title">Product Performance Reports</span>
+        <i class="menu-arrow"></i>
+    </a>
+    <div class="collapse" id="ui-basic">
+        <ul class="nav flex-column sub-menu">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/inventory_levels') }}">Inventory Levels</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/product_return_rate') }}">Product Return Rates</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/customer_purchase_f') }}">Product Ratings and Reviews</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/customer_lifetime_value') }}">Product Profitability</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('/customer_lifetime_value') }}">Product Trends</a>
+            </li>
+        </ul>
+    </div>
+</li> -->
+
+
+</nav>
