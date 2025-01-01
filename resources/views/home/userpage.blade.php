@@ -142,50 +142,7 @@
       
       <!-- product section -->
       @include('home.product')
-      <!-- end product section -->
-      <!-- <div>
-         <h1 style="font-size:30px;text-align:center;padding-top:20px;padding-bottom:20px;">Comments</h1>
-         <form action="{{ url('add_comment') }}" method="POST">
-            @csrf
-            <textarea name="comment" id="" placeholder="Comment something here"></textarea>
-            <input type="submit" value="Comment" name="" class="btn btn-primary">
-         </form>
-      </div>
-      <div>
-      <h1>All Comments</h1>
-@if($comments->isNotEmpty())
-    @foreach($comments as $comment)
-        <div>
-            <h3>{{ $comment->name }}</h3>
-            <p>{{ $comment->comment }}</p>
-            <a href="javascript:void(0);" onclick="reply(this)" data-Commentid="{{ $comment->id }}">Reply</a>
-            @if($comment->replies->isNotEmpty())
-                <div style="margin-left: 20px;">
-                    <h4>Replies:</h4>
-                    @foreach($comment->replies as $reply)
-                        <div>
-                            <h5>{{ $reply->name }}</h5>
-                            <p>{{ $reply->reply }}</p>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-        </div>
-    @endforeach
-@else
-    <p>No comments available.</p>
-@endif
-      </div>
-
-<div style="display: none;" class="replyDiv">
-<form action="{{url('add_reply')}}" method="POST">
-    @csrf
-    <input type="text" id="commentId" name="commentId" hidden="">
-    <textarea name="reply" id="" placeholder="Write something here"></textarea>
-    <button type="submit" value="Reply" class="btn btn-success">Reply</button>
-    <a href="javascript:void(0);" class="btn" onclick="reply_close(this)">Close</a>
-</form>
-</div> -->
+      
 <div class="comments-section">
     <h1>Comments</h1>
     <form action="{{ url('add_comment') }}" method="POST" class="comment-form">

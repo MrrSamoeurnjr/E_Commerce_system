@@ -3,8 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AminController;
+use App\Http\Controllers\SuperAdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use App\Http\Controllers\ChatController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -48,6 +50,16 @@ route::get('/cancel_order/{id}',[HomeController::class,'cancel_order']);
 Route::post('/add_comment', [HomeController::class, 'add_comment']);
 route::post('/add_reply',[HomeController::class,'add_reply']);
 route::get('/search',[HomeController::class,'search']);
+route::get('/blog_template',[HomeController::class,'blog_template']);
+route::get('/about_template',[HomeController::class,'about_template']);
+route::get('/testmonial_template',[HomeController::class,'testmonial_template']);
+route::get('/showallproduct',[HomeController::class,'showallproduct']);
+route::get('/qrcodeforpaying',[HomeController::class,'qrcodeforpaying']);
+route::get('/computer',[HomeController::class,'computer']);
+route::get('/phone',[HomeController::class,'phone']);
+route::get('/airpod',[HomeController::class,'airpod']);
+
+
 route::get('/popular_product',[AminController::class,'popular_product']);
 route::get('/contact_template',[HomeController::class,'contact_template']);
 Route::get('/user_activity_log', [AminController::class, 'user_activity_log']);
@@ -63,6 +75,15 @@ Route::get('/customer_lifetime_value', [AminController::class, 'customer_lifetim
 Route::get('/customer_feedback_review', [AminController::class, 'customer_feedback_review']);
 Route::get('/inventory_levels', [AminController::class, 'inventory_levels']);
 Route::get('/product_return_rate', [AminController::class, 'product_return_rate']);
+Route::get('/user_role_permission', [SuperAdminController::class, 'user_role_permission']);
+
+Route::get('/chat', [ChatController::class, 'index'])->name('chat');
+Route::post('/send-message', [ChatController::class, 'sendMessage'])->name('send.message');
+
+Route::get('/chats', [ChatController::class, 'adminChats'])->name('admin.chats');
+Route::get('/chats/{chat}', [ChatController::class, 'adminViewChat'])->name('admin.viewChat');
+Route::post('/chats/{chat}', [ChatController::class, 'adminSendMessage'])->name('admin.sendMessage');
+
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
@@ -80,3 +101,6 @@ Route::post('/email/verification-notification', function (Request $request) {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+
+

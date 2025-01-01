@@ -11,9 +11,12 @@ use App\Models\Order;
 use App\Models\Comment;
 use App\Models\Reply;
 use Illuminate\Support\Facades\Session;
+use PhpParser\Node\Expr\FuncCall;
 use PHPUnit\Framework\Reorderable;
 // use Session;
 use Stripe;
+use Symfony\Component\HttpKernel\Debug\VirtualRequestStack;
+
 class HomeController extends Controller
 {
     public function index()
@@ -44,7 +47,11 @@ class HomeController extends Controller
                 $total_revenue += $order->price;
             }
             return view('admin.home', compact('total_product', 'total_user', 'order', 'total_revenue', 'total_order', 'total_delivered', 'total_processing'));
-        } else {
+        }
+        else if($usertype == '2'){
+            return view('superadmin.home');
+        }
+         else {
             $user = Auth::user(); 
             $product = Product::paginate(6);
             // $comments = Comment::all();
@@ -274,6 +281,55 @@ public function search(Request $request)
     public function contact_template()
     {
         return view('home.contact_template');
+    }
+    public function blog_template()
+    {
+        return view('home.blog_template');
+    }
+    public function about_template()
+    {
+        return view('home.about_template');
+    }
+    public function testmonial_template()
+    {
+        return view('home.testmonial_template');
+    }
+    public function showallproduct()
+    {
+        $products = Product::all();  // Fetch all products from the database
+        return view('home.showallproduct' , compact('products'));
+    }
+    public function qrcodeforpaying()
+    {
+        return view('home.qrcodeforpaying');
+    }
+    public function computer()
+    {
+        // $computer = Product::where('category','Computer')->paginate(6);
+        $computers = Product::where('title', 'LIKE', '%Computer%')
+        ->orWhere('title', 'LIKE', '%Mac%')
+        ->orWhere('description', 'LIKE', '%Computer%')
+        ->orWhere('description', 'LIKE', '%Mac%')
+        ->paginate(6);
+        return view('home.computer' , compact('computers'));
+    }
+    public function phone()
+    {
+         $phones = Product::where('title', 'LIKE', '%Phone%')
+         ->orWhere('title', 'LIKE', '%iPhone%')
+         ->orWhere('description', 'LIKE', '%Phone%')
+         ->orWhere('description', 'LIKE', '%iPhone%')
+         ->paginate(6);
+        return view('home.phone' , compact('phones'));
+    }
+    public function airpod()
+    {
+        $airpods= Product::where('title', 'LIKE', '%AirPod%')
+        ->orWhere('title', 'LIKE', '%AirPod%')
+        ->orWhere('description', 'LIKE', '%AirPod%')
+        ->orWhere('description', 'LIKE', '%AirPod%')
+        ->paginate(6);
+        return view('home.airpod' , compact('airpods'));
     }
 }
 

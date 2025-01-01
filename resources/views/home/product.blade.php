@@ -11,9 +11,15 @@
         <input  type="text" name="query" placeholder="Search for something">
         <input type="submit" value="Search">
     </form>
+</div>   
 </div>
 
-            </div>
+<div class="chat">
+   <a href="{{ route('chat') }}" class="btn btn-primary">
+      <p>Message to admin</p>
+   </a>
+</div>
+
             <div class="row">
               @foreach($product as $products)
                <div class="col-sm-6 col-md-4 col-lg-4">

@@ -13,22 +13,30 @@
                        <li class="nav-item dropdown">
                            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true"> <span class="nav-label">Pages <span class="caret"></span></a>
                            <ul class="dropdown-menu">
-                              <li><a href="about.html">About</a></li>
-                              <li><a href="testimonial.html">Testimonial</a></li>
+                              <li><a href="{{url('about_template')}}">About</a></li>
+                              <li><a href="{{url('testmonial_template')}}">Testimonial</a></li>
                            </ul>
                         </li>
-                        <li class="nav-item">
-                           <a class="nav-link" href="{{url('/')}}">Products</a>
+
+                        <li class="nav-item dropdown">
+                           <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true"> <span class="nav-label">Product <span class="caret"></span></a>
+                           <ul class="dropdown-menu">
+                              <li><a href="{{url('showallproduct')}}">Clothes</a></li>
+                              <li><a href="{{url('computer')}}">Computer</a></li>
+                              <li><a href="{{url('phone')}}">Phone</a></li>
+                              <li><a href="{{url('airpod')}}">AirPod</a></li>
+                           </ul>
                         </li>
+
+                        <!-- <li class="nav-item">
+                           <a class="nav-link" href="{{url('showallproduct')}}">Products</a>
+                        </li> -->
                         <li class="nav-item">
-                           <a class="nav-link" href="{{url('/')}}">Blog</a>
+                           <a class="nav-link" href="{{url('blog_template')}}">Blog</a>
                         </li>
                         <li class="nav-item">
                            <a class="nav-link" href="{{url('contact_template')}}">Contact</a>
                         </li>
-                        <!-- <li class="nav-item">
-                           <a class="nav-link" href="{{url('show_cart')}}" >Cart</a>
-                        </li> -->
                         <li class="nav-item">
     <a class="nav-link" href="{{url('show_cart')}}">
         Cart <span class="badge badge-pill badge-primary">{{ session('cart_count', 0) }}</span>
@@ -37,11 +45,6 @@
                         <li class="nav-item">
                            <a class="nav-link" href="{{url('show_order')}}">Order</a>
                         </li>
-                        <!-- <form class="form-inline">
-                           <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
-                           <i class="fa fa-search" aria-hidden="true"></i>
-                           </button>
-                        </form> -->
                         @if (Route::has('login'))
                         @auth
                         <x-app-layout>

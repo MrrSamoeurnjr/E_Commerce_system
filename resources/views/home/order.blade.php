@@ -136,7 +136,9 @@ td img {
                 @endforeach
             </table>
          </div>
-      </div>
+      </div>'
+      <!-- Footer section -->
+    @include('home.footer')'
       <!-- jQery -->
       <script src="home/js/jquery-3.4.1.min.js"></script>
       <!-- popper js -->

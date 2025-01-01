@@ -199,36 +199,6 @@
         <span class="menu-title">User Activity Log</span>
     </a>
 </li>
-
-
-<!-- <li class="nav-item menu-items">
-            <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
-              <span class="menu-icon">
-                <i class="mdi mdi-laptop"></i>
-              </span>
-              <span class="menu-title">Sales Reports</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="ui-basic">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> 
-                  <a class="nav-link" href="{{ url('/daily_monthly_sale') }}">Daily/Weekly/Monthly Sales</a>
-                </li>
-                <li class="nav-item">
-                   <a class="nav-link"  href="{{url('/top_selling')}}">Top Selling Products</a>
-                </li>
-                <li class="nav-item"> 
-                  <a class="nav-link" href="{{ url('/sale_by_cateogry') }}">Sales by Category</a>
-                </li>
-                <li class="nav-item">
-                   <a class="nav-link"  href="{{url('/sale_by_reqion')}}">Sales by Region</a>
-                </li>
-                <li class="nav-item">
-                   <a class="nav-link"  href="{{url('/sale_growth')}}">Sales Growth</a>
-                </li>
-              </ul>
-            </div>
- </li> -->
  <li class="nav-item menu-items">
     <a class="nav-link" data-toggle="collapse" href="#sales-reports" aria-expanded="false" aria-controls="sales-reports">
         <span class="menu-icon">
@@ -267,35 +237,6 @@
         </ul>
     </div>
 </li>
-
- <!-- <li class="nav-item menu-items">
-            <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
-              <span class="menu-icon">
-                <i class="mdi mdi-laptop"></i>
-              </span>
-              <span class="menu-title">Customer Behavior Reports</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="ui-basic">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> 
-                  <a class="nav-link" href="{{ url('/new_vs_Returning_Customers') }}">New vs. Returning Customers</a>
-                </li>
-                <li class="nav-item">
-                   <a class="nav-link"  href="{{url('/top_selling')}}">Customer Demographics</a>
-                </li>
-                <li class="nav-item"> 
-                  <a class="nav-link" href="{{ url('/sale_by_cateogry') }}">Customer Purchase Frequency</a>
-                </li>
-                <li class="nav-item">
-                   <a class="nav-link"  href="{{url('/sale_by_reqion')}}">Customer Lifetime Value (CLV)</a>
-                </li>
-                <li class="nav-item">
-                   <a class="nav-link"  href="{{url('/sale_growth')}}">Customer Feedback and Reviews</a>
-                </li>
-              </ul>
-            </div>
- </li> -->
  <li class="nav-item menu-items">
     <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
         <span class="menu-icon">
@@ -321,36 +262,16 @@
         </ul>
     </div>
 </li>
-
-<!-- 
 <li class="nav-item menu-items">
-    <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+    <a class="nav-link" href="{{ route('admin.chats') }}">
         <span class="menu-icon">
             <i class="mdi mdi-laptop"></i>
         </span>
-        <span class="menu-title">Product Performance Reports</span>
-        <i class="menu-arrow"></i>
+        <span class="menu-title">View User Chats</span>
     </a>
-    <div class="collapse" id="ui-basic">
-        <ul class="nav flex-column sub-menu">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/inventory_levels') }}">Inventory Levels</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/product_return_rate') }}">Product Return Rates</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/customer_purchase_f') }}">Product Ratings and Reviews</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/customer_lifetime_value') }}">Product Profitability</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('/customer_lifetime_value') }}">Product Trends</a>
-            </li>
-        </ul>
-    </div>
-</li> -->
-
+</li>
 
 </nav>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+

@@ -97,6 +97,7 @@
             <h3 class="edit_tow_button">Procced to Order</h3>
             <a class="btn btn-success" href="{{url('cash_order')}}">Cash on Delivery</a>
             <a class="btn btn-primary" href="{{url('stripe',$totalprice)}}">Pay Using Card</a>
+            <a class="btn btn-secondary" href="{{url('qrcodeforpaying')}}">Pay Using QR Code</a>
          </div>
       </div>
       </div>

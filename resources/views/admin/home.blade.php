@@ -14,7 +14,7 @@
         @include('admin.header')
         <!-- partial -->
         @include('admin.body')
-        <!-- main-panel ends -->
+        <!-- main-panel ends -->  
       </div>
       <!-- page-body-wrapper ends -->
     </div>

@@ -165,24 +165,6 @@ class AminController extends Controller
   }
   public function user_activity_log()
   {
-      // Your logic here 
-       // Fetch all users from the database
-    // $users = \App\Models\User::all();
-    // Fetch users with their username, email, and registration datetime
-    // $users = \App\Models\User::select('name', 'email', 'created_at')->get();
-
-    // return view('admin.user_activity_log', compact('users'));
-    // Pass the users to the view
-    // return view('admin.user_activity_log', compact('users'));
-      // return view('admin.user_activity_log');
-    //   $users = \App\Models\User::select('users.name', 'users.email', 'users.created_at', DB::raw('COUNT(orders.id) as total_paid_orders'))
-    //     ->leftJoin('orders', function($join) {
-    //         $join->on('users.id', '=', 'orders.user_id')
-    //              ->where('orders.payment_status', '=', 'Paid');
-    //     })
-    //     ->groupBy('users.id', 'users.name', 'users.email', 'users.created_at')
-    //     ->get();
-
     // return view('admin.user_activity_log', compact('users'));
     $users = \App\Models\User::select(
       'users.name', 
