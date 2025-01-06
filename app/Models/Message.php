@@ -8,7 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class Message extends Model
 {
     use HasFactory;
-    protected $fillable = ['chat_id', 'user_id', 'message','image'];
+    protected $fillable = [
+        'chat_id',
+        'user_id',
+        'message',
+        'voice_message'
+    ];
+
+    protected $nullable = [
+        'message',
+        'voice_message'
+    ];
 
     public function chat()
     {
@@ -19,6 +29,7 @@ class Message extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     public function image()
     {
         return $this->hasOne(Image::class);

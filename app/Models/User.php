@@ -31,6 +31,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone',
         'address',
         'password',
+        'usertype',
     ];
 
     /**
@@ -65,5 +66,20 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected $attributes = [
+        'usertype' => '0',
+    ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($user) {
+            if (!isset($user->usertype)) {
+                $user->usertype = '0';
+            }
+        });
     }
 }

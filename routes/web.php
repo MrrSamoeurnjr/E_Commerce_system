@@ -7,6 +7,7 @@ use App\Http\Controllers\SuperAdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ChatController;
+use Illuminate\Support\Facades\DB;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -101,6 +102,36 @@ Route::post('/email/verification-notification', function (Request $request) {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+// Only use this in development!
+Route::get('/check-tokens', function() {
+    $tokens = DB::table('password_reset_tokens')->get();
+    return response()->json([
+        'tokens' => $tokens,
+        'count' => $tokens->count()
+    ]);
+});
+
+// Add these routes for password reset functionality
+Route::get('/check-token/{token}', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'checkToken'])
+    ->name('password.check-token');
+
+// For development only - to view all tokens
+Route::get('/check-tokens', function() {
+    if (app()->environment('local')) {  // Only in local environment
+        $tokens = DB::table('password_reset_tokens')->get();
+        return response()->json([
+            'tokens' => $tokens,
+            'count' => $tokens->count()
+        ]);
+    }
+    return abort(404);
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/check-token/{token}', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'checkToken'])
+        ->name('password.check-token');
+});
 
 
 

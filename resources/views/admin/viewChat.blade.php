@@ -3,144 +3,419 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Chat</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Chat with {{ $chat->user->name }}</title>
     <base href="/public">
     @include('admin.css')
-    
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .message-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        .message.sent {
+            background-color: #e3f2fd;
+            margin-left: 20%;
+        }
+        .message.received {
+            background-color: #f5f5f5;
+            margin-right: 20%;
+        }
+        .message-image {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .message-image img {
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 200px;
+        }
+        .chat-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .voice-message {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .voice-message audio {
+            width: 100%;
+            max-width: 300px;
+        }
+        .voice-controls {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .camera-controls {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+        }
 
-<style>
-    /* Chat container */
-    .chat-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 80vh;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 15px;
-        background-color: #f9f9f9;
-    }
+        .camera-preview {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
 
-    /* Chat box */
-    .chat-box {
-        height: 65vh;
-        overflow-y: auto;
-        margin-bottom: 15px;
-        background-color: #fff;
-        padding: 10px;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
+        #cameraPreview, #photoCanvas, #capturedPhoto {
+            border-radius: 8px;
+            margin: 0 auto;
+        }
 
-    /* Message bubbles */
-    .message {
-        margin-bottom: 10px;
-        display: flex;
-        justify-content: flex-start;
-    }
+        .camera-controls button {
+            margin-right: 5px;
+        }
 
-    .message.admin {
-        justify-content: flex-end;
-    }
+        #cancelCamera {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
 
-    .message p {
-        padding: 10px 15px;
-        border-radius: 15px;
-        max-width: 70%;
-        font-size: 15px;
-    }
-
-    .message.admin p {
-        background-color: #007bff;
-        color: #fff;
-    }
-
-    .message.user p {
-        background-color: #e0e0e0;
-        color: #333;
-    }
-
-    /* Chat input area */
-    .chat-input {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .chat-input textarea {
-        flex-grow: 1;
-        border-radius: 20px;
-        padding: 10px 20px;
-        border: 1px solid #ddd;
-        outline: none;
-        font-size: 14px;
-        height: 50px;
-        resize: none;
-    }
-
-    .chat-input button {
-        border-radius: 20px;
-        height: 50px;
-    }
-
-    /* Scrollbar styling */
-    .chat-box::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    .chat-box::-webkit-scrollbar-thumb {
-        background-color: #007bff;
-        border-radius: 10px;
-    }
- #edit_username
- {  
-    color: white;
- }
-</style>
+        #cancelCamera:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+    </style>
 </head>
 <body>
-<div class="container-scroller">
-<!-- partial:partials/_sidebar.html -->
-@include('admin.sidebar')
-<!-- partial -->
-<!-- partial:partials/_navbar.html -->
-@include('admin.header')
-<!-- partial -->
-<div class="main-panel">
-    <div class="content-wrapper">
-        <div class="container mt-4">
-            <h3 id="edit_username" class="mb-4">Chat with {{ $chat->user->name }}</h3>
+    <div class="container-scroller">
+        @include('admin.sidebar')
+        @include('admin.header')
+        
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Chat with {{ $chat->user->name }}</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="message-container">
+                                        @foreach($chat->messages as $message)
+                                            <div class="message {{ $message->user_id == Auth::id() ? 'sent' : 'received' }}">
+                                                <strong>{{ $message->user->name }}:</strong>
+                                                
+                                                @if($message->message)
+                                                    <p>{{ $message->message }}</p>
+                                                @endif
+                                                
+                                                @if($message->voice_message)
+                                                    <div class="voice-message">
+                                                        <audio controls>
+                                                            <source src="{{ $message->voice_message }}" type="audio/mp3">
+                                                            Your browser does not support the audio element.
+                                                        </audio>
+                                                    </div>
+                                                @endif
+                                                
+                                                @if($message->image)
+                                                    <div class="message-image">
+                                                        <img src="{{ asset('storage/' . $message->image->image_path) }}" 
+                                                             alt="Chat Image" 
+                                                             class="img-fluid">
+                                                    </div>
+                                                @endif
+                                                
+                                                <small class="text-muted">
+                                                    {{ $message->created_at->format('M d, Y H:i') }}
+                                                </small>
+                                            </div>
+                                        @endforeach
+                                    </div>
 
-            <div class="chat-container">
-                <!-- Chat Box -->
-                <div class="chat-box">
-                    @foreach ($chat->messages as $message)
-                        <div class="message {{ $message->user_id == $chat->user->id ? 'user' : 'admin' }}">
-                            @if ($message->user_id == $chat->user->id)
-                                <p><strong>{{ $chat->user->name }}:</strong> {{ $message->message }}</p>
-                            @else
-                                <p><strong>Admin:</strong> {{ $message->message }}</p>
-                            @endif
+                                    <!-- Reply Form -->
+                                    <form id="chatForm" action="{{ route('admin.sendMessage', $chat->id) }}" method="POST" enctype="multipart/form-data" class="chat-form">
+                                        @csrf
+                                        <div class="form-group">
+                                            <textarea name="message" class="form-control" rows="3" placeholder="Type your message..."></textarea>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <input type="file" name="image" accept="image/*" class="form-control-file">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="camera-controls">
+                                                <button type="button" id="startCamera" class="btn btn-info">
+                                                    <i class="fa fa-camera"></i> Open Camera
+                                                </button>
+                                                <button type="button" id="takePhoto" class="btn btn-success" style="display: none;">
+                                                    <i class="fa fa-camera"></i> Take Photo
+                                                </button>
+                                                <button type="button" id="retakePhoto" class="btn btn-warning" style="display: none;">
+                                                    Retake
+                                                </button>
+                                                <button type="button" id="cancelCamera" class="btn btn-danger" style="display: none;">
+                                                    <i class="fa fa-times"></i> Cancel
+                                                </button>
+                                            </div>
+                                            <div class="camera-preview mt-2">
+                                                <video id="cameraPreview" style="display: none; max-width: 100%; width: 400px;" autoplay></video>
+                                                <canvas id="photoCanvas" style="display: none; max-width: 100%; width: 400px;"></canvas>
+                                                <img id="capturedPhoto" style="display: none; max-width: 100%; width: 400px;" />
+                                            </div>
+                                            <input type="hidden" name="captured_photo" id="capturedPhotoData">
+                                        </div>
+
+                                        <div class="voice-controls">
+                                            <button type="button" id="startRecording" class="btn btn-info">
+                                                <i class="fa fa-microphone"></i> Start Recording
+                                            </button>
+                                            <button type="button" id="stopRecording" class="btn btn-danger" style="display: none;">
+                                                <i class="fa fa-stop"></i> Stop Recording
+                                            </button>
+                                            <audio id="audioPlayback" controls style="display: none;"></audio>
+                                            <input type="hidden" name="voice_message" id="voiceMessage">
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary">Send Message</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                    @endforeach
+                    </div>
                 </div>
-
-                <!-- Chat Input -->
-                <form action="{{ route('admin.sendMessage', $chat->id) }}" method="POST" class="chat-input">
-                    @csrf
-                    <textarea name="message" class="form-control" placeholder="Type your message..."></textarea>
-                    <button type="submit" class="btn btn-primary">Send</button>
-                </form>
             </div>
         </div>
     </div>
-</div>
-</div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let stream;
+        const cameraPreview = document.getElementById('cameraPreview');
+        const photoCanvas = document.getElementById('photoCanvas');
+        const capturedPhoto = document.getElementById('capturedPhoto');
+        const startCameraBtn = document.getElementById('startCamera');
+        const takePhotoBtn = document.getElementById('takePhoto');
+        const retakePhotoBtn = document.getElementById('retakePhoto');
+        const cancelCameraBtn = document.getElementById('cancelCamera');
 
+        document.getElementById('startRecording').addEventListener('click', async () => {
+            try {
+                audioChunks = [];
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    // Show preview
+                    const audio = document.getElementById('audioPlayback');
+                    audio.src = audioUrl;
+                    audio.style.display = 'block';
+
+                    // Convert to base64
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const base64Audio = reader.result;
+                        document.getElementById('voiceMessage').value = base64Audio;
+                    };
+                    reader.readAsDataURL(audioBlob);
+                };
+
+                mediaRecorder.start();
+                document.getElementById('startRecording').style.display = 'none';
+                document.getElementById('stopRecording').style.display = 'inline-block';
+
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Error accessing microphone. Please ensure you have granted permission.');
+            }
+        });
+
+        document.getElementById('stopRecording').addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                document.getElementById('startRecording').style.display = 'inline-block';
+                document.getElementById('stopRecording').style.display = 'none';
+            }
+        });
+
+        startCameraBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                cameraPreview.srcObject = stream;
+                cameraPreview.style.display = 'block';
+                startCameraBtn.style.display = 'none';
+                takePhotoBtn.style.display = 'inline-block';
+                cancelCameraBtn.style.display = 'inline-block';
+                capturedPhoto.style.display = 'none';
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Error accessing camera. Please ensure you have granted permission.');
+            }
+        });
+
+        takePhotoBtn.addEventListener('click', () => {
+            photoCanvas.width = cameraPreview.videoWidth;
+            photoCanvas.height = cameraPreview.videoHeight;
+            
+            const context = photoCanvas.getContext('2d');
+            context.drawImage(cameraPreview, 0, 0, photoCanvas.width, photoCanvas.height);
+            
+            const photoData = photoCanvas.toDataURL('image/jpeg');
+            capturedPhoto.src = photoData;
+            document.getElementById('capturedPhotoData').value = photoData;
+            
+            cameraPreview.style.display = 'none';
+            capturedPhoto.style.display = 'block';
+            takePhotoBtn.style.display = 'none';
+            retakePhotoBtn.style.display = 'inline-block';
+            cancelCameraBtn.style.display = 'inline-block';
+            
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
+
+        retakePhotoBtn.addEventListener('click', () => {
+            startCameraBtn.click();
+            retakePhotoBtn.style.display = 'none';
+            document.getElementById('capturedPhotoData').value = '';
+            cancelCameraBtn.style.display = 'inline-block';
+        });
+
+        cancelCameraBtn.addEventListener('click', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            cameraPreview.style.display = 'none';
+            capturedPhoto.style.display = 'none';
+            photoCanvas.style.display = 'none';
+            startCameraBtn.style.display = 'inline-block';
+            takePhotoBtn.style.display = 'none';
+            retakePhotoBtn.style.display = 'none';
+            cancelCameraBtn.style.display = 'none';
+            document.getElementById('capturedPhotoData').value = '';
+        });
+
+        // Handle form submission
+        document.getElementById('chatForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Clear form
+                    this.reset();
+                    // Clear camera preview and stop stream
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+                    cameraPreview.style.display = 'none';
+                    capturedPhoto.style.display = 'none';
+                    photoCanvas.style.display = 'none';
+                    startCameraBtn.style.display = 'inline-block';
+                    takePhotoBtn.style.display = 'none';
+                    retakePhotoBtn.style.display = 'none';
+                    document.getElementById('audioPlayback').style.display = 'none';
+                    
+                    // Reload only the messages container
+                    const messagesContainer = document.querySelector('.message-container');
+                    const response = await fetch(window.location.href);
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newMessages = doc.querySelector('.message-container');
+                    messagesContainer.innerHTML = newMessages.innerHTML;
+                    
+                    // Scroll to bottom
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                } else {
+                    alert(result.message || 'Failed to send message');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to send message. Please try again.');
+            }
+        });
+
+        // Auto-scroll to bottom of message container
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.message-container');
+            container.scrollTop = container.scrollHeight;
+        });
+
+        // Add message polling
+        function pollForNewMessages() {
+            setInterval(async () => {
+                try {
+                    const response = await fetch(window.location.href);
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newMessages = doc.querySelector('.message-container');
+                    const currentMessages = document.querySelector('.message-container');
+                    
+                    if (newMessages.innerHTML !== currentMessages.innerHTML) {
+                        currentMessages.innerHTML = newMessages.innerHTML;
+                        currentMessages.scrollTop = currentMessages.scrollHeight;
+                    }
+                } catch (error) {
+                    console.error('Error polling messages:', error);
+                }
+            }, 5000); // Poll every 5 seconds
+        }
+
+        // Start polling when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            pollForNewMessages();
+        });
+    </script>
 </body>
 </html>

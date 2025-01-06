@@ -44,6 +44,33 @@
             word-wrap: break-word;
             white-space: normal;
         }
+        .message-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        .message.sent {
+            background-color: #e3f2fd;
+            margin-left: 20%;
+        }
+        .message.received {
+            background-color: #f5f5f5;
+            margin-right: 20%;
+        }
+        .message-image {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .message-image img {
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -71,7 +98,16 @@
                                     @foreach($chats as $chat)
                                         <tr>
                                             <td>{{ $chat->user->name }}</td>
-                                            <td class="edit_message">{{ $chat->messages->last()->message ?? 'No messages yet' }}</td>
+                                            <td class="edit_message">
+                                                @if($chat->messages->last())
+                                                    {{ $chat->messages->last()->message }}
+                                                    @if($chat->messages->last()->image)
+                                                        <br><small>(Has attachment)</small>
+                                                    @endif
+                                                @else
+                                                    No messages yet
+                                                @endif
+                                            </td>
                                             <td>
                                                 <a href="{{ route('admin.viewChat', $chat->id) }}" class="btn btn-primary btn-sm">View Chat</a>
                                             </td>

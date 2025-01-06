@@ -16,6 +16,9 @@ use PHPUnit\Framework\Reorderable;
 // use Session;
 use Stripe;
 use Symfony\Component\HttpKernel\Debug\VirtualRequestStack;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use App\Models\BusinessUser;
 
 class HomeController extends Controller
 {
@@ -330,6 +333,44 @@ public function search(Request $request)
         ->orWhere('description', 'LIKE', '%AirPod%')
         ->paginate(6);
         return view('home.airpod' , compact('airpods'));
+    }
+    public function register(Request $request)
+    {
+        try {
+            // Validate user input
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8|confirmed',
+                'phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string|max:255',
+            ]);
+
+            // Create user with explicit usertype
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'phone' => $validated['phone'],
+                'address' => $validated['address'],
+                'usertype' => '0',  // Explicitly set usertype
+            ]);
+
+            // Log success
+            \Log::info('User created successfully', ['user_id' => $user->id]);
+
+            return redirect()->route('login')
+                ->with('success', 'Registration successful! Please login.');
+
+        } catch (\Exception $e) {
+            // Log the error
+            \Log::error('Registration error: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+
+            return back()
+                ->withErrors(['error' => 'Registration failed: ' . $e->getMessage()])
+                ->withInput();
+        }
     }
 }
 

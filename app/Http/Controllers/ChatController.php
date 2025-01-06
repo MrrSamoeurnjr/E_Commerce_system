@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Message;
 use App\Models\Chat;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Models\Image;
+use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
 {
@@ -54,35 +58,87 @@ public function index()
 
     // Handle message sending
     
+    private function saveBase64Image($base64Data)
+    {
+        try {
+            // Remove data URI scheme prefix
+            $image_parts = explode(";base64,", $base64Data);
+            $image_base64 = base64_decode($image_parts[1]);
+            
+            // Generate unique filename
+            $filename = 'captured_' . time() . '_' . uniqid() . '.jpg';
+            $path = 'chat_images/' . $filename;
+            
+            // Save file
+            Storage::disk('public')->put($path, $image_base64);
+            
+            return $path;
+        } catch (\Exception $e) {
+            \Log::error('Error saving captured photo: ' . $e->getMessage());
+            return null;
+        }
+    }
+
     public function sendMessage(Request $request)
     {
-        $request->validate([
-            'message' => 'required',
-            'image' => 'nullable|image|max:2048', // Ensure valid images up to 2MB
-        ]);
-
-        // Get or create the chat for the user
-        $chat = Chat::where('user_id', Auth::id())->first();
-        if (!$chat) {
-            $chat = Chat::create([
-                'user_id' => Auth::id(),
-                'admin_id' => 1, // Assuming admin ID is 1
+        try {
+            DB::beginTransaction();
+            
+            $request->validate([
+                'message' => 'nullable|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'voice_message' => 'nullable|string|max:20000000',
+                'captured_photo' => 'nullable|string|max:5000000'
             ]);
-        }
-// Handle file upload if present
-$imagePath = null;
-if ($request->hasFile('image')) {
-    $imagePath = $request->file('image')->store('chat_images', 'public');
-}
-        // Save the message
-        Message::create([
-            'chat_id' => $chat->id,
-            'user_id' => Auth::id(),
-            'message' => $request->message,
-            'image' => $imagePath,
-        ]);
 
-        return redirect()->back()->with('success','Message sent successfully');
+            $chat = Chat::firstOrCreate(
+                ['user_id' => Auth::id()],
+                ['admin_id' => 1]
+            );
+
+            $messageData = [
+                'chat_id' => $chat->id,
+                'user_id' => Auth::id(),
+                'message' => $request->message,
+                'voice_message' => $request->voice_message
+            ];
+
+            $message = Message::create($messageData);
+
+            // Handle uploaded image
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                if ($image->isValid()) {
+                    $imagePath = $image->store('chat_images', 'public');
+                    Image::create([
+                        'message_id' => $message->id,
+                        'image_path' => $imagePath
+                    ]);
+                }
+            }
+
+            // Handle captured photo
+            if ($request->captured_photo) {
+                $imagePath = $this->saveBase64Image($request->captured_photo);
+                if ($imagePath) {
+                    Image::create([
+                        'message_id' => $message->id,
+                        'image_path' => $imagePath
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Message sent successfully']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Chat Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send message: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
 
@@ -98,27 +154,71 @@ if ($request->hasFile('image')) {
     // Admin view: Specific chat messages with a user
     public function adminViewChat($chatId)
     {
-        $chat = Chat::with('messages', 'user')->findOrFail($chatId);
-        return view('admin.viewChat', compact('chat'));
+        try {
+            $chat = Chat::with(['messages.user', 'messages.image'])->findOrFail($chatId);
+            return view('admin.viewChat', compact('chat'));
+        } catch (\Exception $e) {
+            \Log::error('Error viewing chat: ' . $e->getMessage());
+            return back()->with('error', 'Error loading chat');
+        }
     }
 
     // Admin sends a message
-    public function adminSendMessage(Request $request, $chatId)
+    public function adminSendMessage(Request $request, Chat $chat)
     {
-        $request->validate([
-            'message' => 'required',
-        ]);
+        try {
+            DB::beginTransaction();
+            
+            $request->validate([
+                'message' => 'nullable|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'voice_message' => 'nullable|string|max:20000000',
+                'captured_photo' => 'nullable|string|max:5000000'
+            ]);
 
-        // Find the chat and create a new message
-        $chat = Chat::findOrFail($chatId);
+            $messageData = [
+                'chat_id' => $chat->id,
+                'user_id' => Auth::id(),
+                'message' => $request->message,
+                'voice_message' => $request->voice_message
+            ];
 
-        Message::create([
-            'chat_id' => $chat->id,
-            'user_id' => Auth::id(), // Assuming the admin is logged in
-            'message' => $request->message,
-        ]);
+            $message = Message::create($messageData);
 
-        return redirect()->route('admin.viewChat', $chatId);
+            // Handle uploaded image
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                if ($image->isValid()) {
+                    $imagePath = $image->store('chat_images', 'public');
+                    Image::create([
+                        'message_id' => $message->id,
+                        'image_path' => $imagePath
+                    ]);
+                }
+            }
+
+            // Handle captured photo
+            if ($request->captured_photo) {
+                $imagePath = $this->saveBase64Image($request->captured_photo);
+                if ($imagePath) {
+                    Image::create([
+                        'message_id' => $message->id,
+                        'image_path' => $imagePath
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Message sent successfully']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Admin Chat Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send message: ' . $e->getMessage()
+            ], 500);
+        }
     }
     // for admin
     public function editMessage($messageId)
