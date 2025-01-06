@@ -45,7 +45,7 @@
                     </div>
                 @endforeach
             @else
-                <p class="text-center">No airpods available at the moment.</p>
+                <p class="text-center">No airpods available at the moment yet.</p>
             @endif
         </div>
         <div class="d-flex justify-content-center">
